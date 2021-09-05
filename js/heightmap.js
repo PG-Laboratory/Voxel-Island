@@ -7,7 +7,7 @@ const Heightmap = function (size) {
 
         for (let y = 0; y < size; ++y) {
             for (let x = 0; x < size; ++x) {
-                heights[x + size * y] = Math.pow(cubicNoiseSample2(noise, x * s, y * s), 4) - 0.08;
+                heights[x + size * y] = Math.pow(cubicNoiseSample2(noise, x * s, y * s), 3) - 0.08;
             }
         }
     };
