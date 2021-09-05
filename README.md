@@ -1,2 +1,2 @@
 #Voxel Island
-Islands
+Is
