@@ -1,5 +1,5 @@
-const Island = function(size, height, plan) {
-    const layers = [];
+const Island = function(size, plan) {
+    const height = Math.ceil(size * Island.HEIGHT);
 
     for (let i = 0; i < height; ++i) {
         const canvas = document.createElement("canvas");
@@ -60,6 +60,7 @@ const Island = function(size, height, plan) {
 
 Island.SCALE = 3.5;
 Island.Y_SCALE = 0.35;
+Island.HEIGHT = 0.22;
 Island.LIGHTING_AMBIENT = 0.9;
 Island.LIGHTING_ANGLE = new Vector3(1, -1, 2.5).normalize();
 Island.GRADIENT_BEACH_START = 0;
