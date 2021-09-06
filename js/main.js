@@ -19,6 +19,7 @@ const resize = () => {
     canvas.height = wrapper.offsetHeight;
     size = Math.floor(canvas.width * H_FILL / Island.SCALE);
     island = new Island(size, 60, new Plan(size));
+    updated = true;
 };
 
 const update = timeStep => {
@@ -32,9 +33,11 @@ const update = timeStep => {
         context.save();
         context.translate(canvas.width * 0.5, canvas.height * 0.5);
 
-        if (angleDelta !== 0) {
+        if (!dragging && angleDelta !== 0) {
             if ((angle += timeStep * angleDelta) > Math.PI + Math.PI) {
                 angle -= Math.PI + Math.PI;
+            } else if (angle < 0) {
+                angle += Math.PI + Math.PI;
             }
         }
 
@@ -77,7 +80,7 @@ canvas.addEventListener("mouseup", event => {
         angleDelta = ANGLE_SPEED * Math.sign(angleDelta);
     } else {
         angleDelta = 0;
-    } 
+    }
 });
 
 canvas.addEventListener("mousemove", event => {
