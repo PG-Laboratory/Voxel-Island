@@ -25,7 +25,7 @@ const resize = () => {
 const update = timeStep => {
     const context = canvas.getContext("2d");
 
-    // island.update(Math.min(timeStep, TIME_STEP_MAX));
+    //island.update(Math.min(timeStep, TIME_STEP_MAX));
 
     if (updated || (!dragging && angleDelta !== 0)) {
         context.imageSmoothingEnabled = true;
@@ -60,20 +60,18 @@ const loopFunction = () => {
     lastDate = date;
 };
 
-window.onresize = resize;
-
-canvas.addEventListener("mousedown", event => {
-    if (event.button === 1) {
-        island.setPlan(new Plan(size));
-        updated = true;
-    } else {
-        xDrag = event.clientX;
+const mouseDown = (x, y, drag) => {
+    if (drag) {
+        xDrag = x;
         dragging = true;
         angleDelta = 0;
+    } else {
+        island.setPlan(new Plan(size));
+        updated = true;
     }
-});
+};
 
-canvas.addEventListener("mouseup", event => {
+const mouseUp = () => {
     dragging = false;
 
     if (updated) {
@@ -81,16 +79,31 @@ canvas.addEventListener("mouseup", event => {
     } else {
         angleDelta = 0;
     }
-});
+};
 
-canvas.addEventListener("mousemove", event => {
+const mouseMove = (x, y) => {
     if (dragging) {
-        angleDelta = (xDrag - event.clientX) * DRAG_SPEED;
+        angleDelta = (xDrag - x) * DRAG_SPEED;
         angle += angleDelta;
-        xDrag = event.clientX;
+        xDrag = x;
         updated = true;
     }
-});
+};
+
+window.onresize = resize;
+
+canvas.addEventListener("mousedown", event =>
+    mouseDown(event.clientX, event.clientY, event.button === 0));
+canvas.addEventListener("touchstart", event =>
+    mouseDown(event.touches[0].clientX, event.touches[0].clientY, true));
+canvas.addEventListener("mousemove", event =>
+    mouseMove(event.clientX, event.clientY));
+canvas.addEventListener("touchmove", event =>
+    mouseMove(event.touches[0].clientX, event.touches[0].clientY));
+canvas.addEventListener("mouseup", event =>
+    mouseUp());
+canvas.addEventListener("touchend", event =>
+    mouseUp());
 
 resize();
 requestAnimationFrame(loopFunction);
