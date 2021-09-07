@@ -6,9 +6,9 @@ const Heightmap = function (size) {
     const calculateNormals = () => {
         const step = 1 / size;
 
-        for (let y = 1; y < size - 1; ++y)
+        for (let y = 1; y < size - 1; ++y) {
             for (let x = 1; x < size - 1; ++x) {
-                const index = x + y * size;
+            const index = x + size * y;
                 const left = new Vector3(-step, 0, heights[index] - heights[index - 1]);
                 const right = new Vector3(step, 0, heights[index] - heights[index + 1]);
                 const top = new Vector3(0, -step, heights[index] - heights[index - size]);
@@ -22,6 +22,7 @@ const Heightmap = function (size) {
 
                 normals[index] = normal.normalize();
             }
+        }
     };
 
     const fill = () => {
@@ -38,7 +39,7 @@ const Heightmap = function (size) {
 
         for (let y = 0; y < size; ++y) {
             for (let x = 0; x < size; ++x) {
-                const index = x + size * y;
+                const index = x + y * size;
                 const dx = size * 0.5 - x;
                 const dy = size * 0.5 - y;
                 const peakDistance = Math.min(1, Math.sqrt(dx * dx + dy * dy) / size * 2);
