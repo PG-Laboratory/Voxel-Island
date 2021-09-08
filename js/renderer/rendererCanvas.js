@@ -1,8 +1,12 @@
 const RendererCanvas = function (island, canvas) {
+    this.setIsland = newIsland => {
+        island = newIsland;
+    };
+    
     this.clean = () => {
         canvas.getContext("2d").clearRect(0, 0, canvas.width, canvas.height);
     };
-    
+
     this.render = (angle, pitch, scale) => {
         const context = canvas.getContext("2d");
 
