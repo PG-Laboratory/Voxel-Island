@@ -30,7 +30,7 @@ const Island = function (lighting, plan) {
                         data.data[i + 3] = 255;
                     }
 
-                    for (const shape of plan.getShapes())
+                    for (const shape of plan.getShapes().get(x, y, z))
                         if (shape.bounds.contains(x, y, z)) {
                             const sample = shape.sample(x, y, z);
 
