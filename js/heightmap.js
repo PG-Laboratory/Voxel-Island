@@ -1,27 +1,33 @@
-const Heightmap = function (size) {
+const Heightmap = function(size) {
     const heights = new Array(size * size);
-    const normals = new Array(heights.length).fill(Heightmap.NORMAL_EDGE);
+    const normals = new Array(heights.length);
     const types = new Array(heights.length);
 
     const calculateNormals = () => {
         const step = 1 / size;
 
+        for (let y = 1; y < size - 1; ++y) for (let x = 1; x < size - 1; ++x) {
+            const index = x + size * y;
+            const left = new Vector3(-step, 0, heights[index - 1] - heights[index]);
+            const right = new Vector3(step, 0, heights[index + 1] - heights[index]);
+            const top = new Vector3(0, -step, heights[index - size] - heights[index]);
+            const bottom = new Vector3(0, step, heights[index + size] - heights[index]);
+            const normal = new Vector3(0, 0, 0);
+
+            normal.add(bottom.cross(left));
+            normal.add(right.cross(bottom));
+            normal.add(top.cross(right));
+            normal.add(left.cross(top));
+
+            normals[index] = normal.normalize();
+        }
+
+        for (let x = 0; x < size; ++x) {
+            normals[x] = normals[size * size - size + x] = Heightmap.NORMAL_EDGE;
+        }
+           
         for (let y = 1; y < size - 1; ++y) {
-            for (let x = 1; x < size - 1; ++x) {
-                const index = x + size * y;
-                const left = new Vector3(-step, 0, heights[index - 1] - heights[index]);
-                const right = new Vector3(step, 0, heights[index + 1] - heights[index]);
-                const top = new Vector3(0, -step, heights[index - size] - heights[index]);
-                const bottom = new Vector3(0, step, heights[index + size] - heights[index]);
-                const normal = new Vector3(0, 0, 0);
-
-                normal.add(bottom.cross(left));
-                normal.add(right.cross(bottom));
-                normal.add(top.cross(right));
-                normal.add(left.cross(top));
-
-                normals[index] = normal.normalize();
-            }
+            normals[y * size] = normals[y * size + size - 1] = Heightmap.NORMAL_EDGE;
         }
     };
 
@@ -37,41 +43,41 @@ const Heightmap = function (size) {
             s *= Heightmap.SCALE_FALLOFF;
         }
 
-        for (let y = 0; y < size; ++y) {
-            for (let x = 0; x < size; ++x) {
-                const index = x + y * size;
-                const dx = size * 0.5 - x;
-                const dy = size * 0.5 - y;
-                const peakDistance = Math.min(1, Math.sqrt(dx * dx + dy * dy) / size * 2);
-                const multiplier = Heightmap.MULTIPLIER * Math.pow(0.5 + 0.5 * Math.cos(Math.PI * peakDistance), Heightmap.PEAK_POWER);
+        for (let y = 0; y < size; ++y) for (let x = 0; x < size; ++x) {
+            const index = x + y * size;
+            const dx = size * 0.5 - x;
+            const dy = size * 0.5 - y;
+            const peakDistance = Math.min(1, Math.sqrt(dx * dx + dy * dy) / size * 2);
+            const multiplier = Heightmap.MULTIPLIER * Math.pow(0.5 + 0.5 * Math.cos(Math.PI * peakDistance), Heightmap.PEAK_POWER);
 
-                let sample = 0;
-                let influence = Heightmap.OCTAVE_INFLUENCE_INITIAL;
-                let scale = maxScale;
-                for (let octave = 0; octave < Heightmap.OCTAVES; ++octave) {
-                    sample += noises[octave].sample(x * scale, y * scale) * influence;
+            let sample = 0;
+            let influence = Heightmap.OCTAVE_INFLUENCE_INITIAL;
+            let scale = maxScale;
 
-                    influence /= Heightmap.OCTAVE_FALLOFF;
-                    scale *= Heightmap.SCALE_FALLOFF;
-                }
+            for (let octave = 0; octave < Heightmap.OCTAVES; ++octave) {
+                sample += noises[octave].sample(x * scale, y * scale) * influence;
 
-                let height = multiplier * Math.pow(sample, Heightmap.POWER) - Heightmap.WATER_THRESHOLD;
-
-                if (height > 1) {
-                    height = 1 - Math.min(1, Math.max(0, height - 1 - Heightmap.VOLCANO_RIM));
-
-                    if (height === 1)
-                        types[index] = Heightmap.TYPE_DEFAULT;
-                    else
-                        types[index] = Heightmap.TYPE_VOLCANO;
-                } else
-                    types[index] = Heightmap.TYPE_DEFAULT;
-
-                heights[index] = Math.max(0, height);
+                influence /= Heightmap.OCTAVE_FALLOFF;
+                scale *= Heightmap.SCALE_FALLOFF;
             }
 
-            calculateNormals();
+            let height = multiplier * Math.pow(sample, Heightmap.POWER) - Heightmap.WATER_THRESHOLD;
+
+            if (height > 1) {
+                height = 1 - Math.min(1, Math.max(0, height - 1 - Heightmap.VOLCANO_RIM));
+
+                if (height === 1)
+                    types[index] = Heightmap.TYPE_DEFAULT;
+                else
+                    types[index] = Heightmap.TYPE_VOLCANO;
+            }
+            else
+                types[index] = Heightmap.TYPE_DEFAULT;
+
+            heights[index] = Math.max(0, height);
         }
+
+        calculateNormals();
     };
 
     this.getHeight = (x, y) => heights[x + size * y];
@@ -94,5 +100,5 @@ Heightmap.SCALE_FALLOFF = 1.75;
 Heightmap.OCTAVES = 7;
 Heightmap.OCTAVE_FALLOFF = 2.4;
 Heightmap.OCTAVE_INFLUENCE_INITIAL = ((Heightmap.OCTAVE_FALLOFF - 1) *
-        (Math.pow(Heightmap.OCTAVE_FALLOFF, Heightmap.OCTAVES))) /
+    (Math.pow(Heightmap.OCTAVE_FALLOFF, Heightmap.OCTAVES))) /
     (Math.pow(Heightmap.OCTAVE_FALLOFF, Heightmap.OCTAVES) - 1) / Heightmap.OCTAVE_FALLOFF;
