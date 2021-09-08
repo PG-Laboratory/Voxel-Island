@@ -2,12 +2,13 @@ const ANGLE_SPEED = 0.3;
 const DRAG_SPEED = 0.006;
 const X_FILL = 1;
 const HEIGHT_RATIO = 0.18;
+const TIME_STEP_MAX = 0.1;
 
-const lighting = new Lighting();
+const island = new Island(new Lighting());
+const loader = new Loader(document.getElementById("loader"));
 const wrapper = document.getElementById("wrapper");
 const canvas = document.getElementById("renderer");
 let lastDate = new Date();
-let island = null;
 let renderer = null;
 let size = 0;
 let height = 0;
@@ -18,19 +19,24 @@ let angleDelta = ANGLE_SPEED;
 let updated = false;
 let dragging = false;
 let xDrag = 0;
-let timeStepLast = 0;
 
 const resize = () => {
     canvas.width = wrapper.offsetWidth;
     canvas.height = wrapper.offsetHeight;
     size = Math.floor(canvas.width * X_FILL / scale);
     height = Math.ceil(size * HEIGHT_RATIO);
-    island = new Island(lighting, new Plan(size, height));
     renderer = new RendererCanvas(island, canvas);
     updated = true;
 };
 
 const update = timeStep => {
+    if (!island.isReady()) {
+        loader.update(island.generate());
+
+        if (island.isReady())
+            updated = true;
+    }
+
     if (updated || (!dragging && angleDelta !== 0)) {
         if (!dragging && angleDelta !== 0) {
             if ((angle += timeStep * angleDelta) > Math.PI + Math.PI) {
@@ -40,21 +46,24 @@ const update = timeStep => {
             }
         }
 
-        renderer.render(angle, pitch, scale);
+        if (island.isReady())
+            renderer.render(angle, pitch, scale);
 
         updated = false;
     }
-
-    timeStepLast = timeStep;
 };
 
 const loopFunction = () => {
     const date = new Date();
 
-    update((date - lastDate) * 0.001);
+    update(Math.min(TIME_STEP_MAX, (date - lastDate) * 0.001));
     requestAnimationFrame(loopFunction);
 
     lastDate = date;
+};
+
+const replan = () => {
+    island.setPlan(new Plan(size, height));
 };
 
 const mouseDown = (x, y, drag) => {
@@ -62,10 +71,8 @@ const mouseDown = (x, y, drag) => {
         xDrag = x;
         dragging = true;
         angleDelta = 0;
-    } else {
-        island.setPlan(new Plan(size, height));
-        updated = true;
-    }
+    } else
+        replan();
 };
 
 const mouseUp = () => {
@@ -104,3 +111,4 @@ canvas.addEventListener("touchend", event =>
 
 resize();
 requestAnimationFrame(loopFunction);
+replan(); 
