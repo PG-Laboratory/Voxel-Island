@@ -8,7 +8,8 @@
     <div id="wrapper">
         <div id="canvas-wrapper">
             <div id="div-renderer"></div>
-            <canvas id="renderer"></canvas>
+            <canvas id="renderer-webgl"></canvas>
+            <canvas id="renderer-2d"></canvas>
         </div>
         <div id="loader">
             <div id="loaded"></div>
@@ -37,6 +38,7 @@
                                 <select onchange="renderer.setType(this.value); updateParameters()">
                                     <option selected="selected" value="canvas">Canvas</option>
                                     <option value="css">CSS</option>
+                                    <option value="webgl">WebGL 2</option>
                                 </select>
                             </label>
                         </td>
@@ -51,6 +53,7 @@
             </div>
         </div>
     </div>
+    <script src="js/sprocket.js"></script>
     <script src="js/loader.js"></script>
     <script src="js/bufferedCubicNoise.js"></script>
     <script src="js/vector3.js"></script>
@@ -69,6 +72,7 @@
     <script src="js/island.js"></script>
     <script src="js/renderer/rendererCanvas.js"></script>
     <script src="js/renderer/rendererCSS.js"></script>
+    <script src="js/renderer/rendererWebGL.js"></script>
     <script src="js/renderer/renderer.js"></script>
     <script src="js/main.js"></script>
 </body>
