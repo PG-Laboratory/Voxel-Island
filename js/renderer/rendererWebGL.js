@@ -1,10 +1,6 @@
 const RendererWebGL = function (island, canvas) {
     const sprocket = new Sprocket(canvas, false, true);
     const surfaces = [];
-    const clearColor = new Sprocket.Color(
-        RendererWebGL.CLEAR_COLOR.r,
-        RendererWebGL.CLEAR_COLOR.g,
-        RendererWebGL.CLEAR_COLOR.b);
 
     const clear = () => {
         for (const surface of surfaces)
@@ -12,10 +8,8 @@ const RendererWebGL = function (island, canvas) {
 
         surfaces.length = 0;
 
-        sprocket.setClearColor(new Sprocket.Color(0, 0, 0, 0));
         sprocket.clear();
         sprocket.flush();
-        sprocket.setClearColor(clearColor);
     };
 
     const make = () => {
@@ -74,7 +68,7 @@ const RendererWebGL = function (island, canvas) {
         sprocket.flush();
     };
 
-    make();
-};
+    sprocket.setClearColor(new Myr.Color(0, 0, 0, 0));
 
-RendererWebGL.CLEAR_COLOR = StyleUtils.getColor("--color-ocean");
+    make();
+}; 
