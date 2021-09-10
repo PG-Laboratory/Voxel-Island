@@ -1,4 +1,4 @@
-const RendererWebGL = function(island, canvas) {
+const RendererWebGL = function (island, canvas) {
     const sprocket = new Sprocket(canvas, false, true);
     const surfaces = [];
     const clearColor = new Sprocket.Color(
@@ -25,8 +25,9 @@ const RendererWebGL = function(island, canvas) {
             const canvas = island.getLayers()[z];
             const context = canvas.getContext("2d");
             const data = context.getImageData(0, 0, canvas.width, canvas.height);
+
             // TODO: It'd be nice if sprocket.js accepts a canvas directly, or unpacks it under the hood
-            surfaces.push(new sprocket.Surface(canvas.width, canvas.height, data.data, true, false));
+            surfaces.push(new myr.Surface(canvas.width, canvas.height, data.data));
         }
     };
 
@@ -42,11 +43,17 @@ const RendererWebGL = function(island, canvas) {
         sprocket.free();
     };
 
+    this.resize = (width, height) => {
+        sprocket.resize(width, height);
+    };
+
+
     this.render = (angle, pitch, scale) => {
         sprocket.clear();
+        sprocket.bind();
         sprocket.push();
 
-        sprocket.translate(canvas.width * 0.5, canvas.height * 0.5);
+        sprocket.translate(sprocket.getWidth() * 0.5, sprocket.getHeight() * 0.5);
 
         for (let z = 0; z < island.getPlan().getHeight(); ++z) {
             sprocket.push();
@@ -67,4 +74,4 @@ const RendererWebGL = function(island, canvas) {
     make();
 };
 
-RendererWebGL.CLEAR_COLOR = StyleUtils.getColor("--color-ocean"); 
+RendererWebGL.CLEAR_COLOR = StyleUtils.getColor("--color-ocean");
