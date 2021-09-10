@@ -22,12 +22,11 @@ const RendererWebGL = function (island, canvas) {
         clear();
 
         for (let z = 0; z < island.getPlan().getHeight(); ++z) {
-            const canvas = island.getLayers()[z];
-            const context = canvas.getContext("2d");
-            const data = context.getImageData(0, 0, canvas.width, canvas.height);
+            const layer = island.getLayers()[z];
+            const context = layer.canvas.getContext("2d");
+            const data = context.getImageData(0, 0, layer.canvas.width, layer.canvas.height);
 
-            // TODO: It'd be nice if sprocket.js accepts a canvas directly, or unpacks it under the hood
-            surfaces.push(new sprocket.Surface(canvas.width, canvas.height, data.data, true, false));
+            surfaces.push(new myr.Surface(layer.canvas.width, layer.canvas.height, data.data, true, false));
         }
     };
 
@@ -56,13 +55,17 @@ const RendererWebGL = function (island, canvas) {
         sprocket.translate(sprocket.getWidth() * 0.5, sprocket.getHeight() * 0.5);
 
         for (let z = 0; z < island.getPlan().getHeight(); ++z) {
+            const layer = island.getLayers()[z];
+
             sprocket.push();
             sprocket.translate(0, (island.getPlan().getHeight() * 0.5 - z) * scale);
             sprocket.scale(1, pitch);
             sprocket.rotate(-angle);
             sprocket.scale(scale, scale);
 
-            surfaces[z].draw(island.getPlan().getSize() * -0.5, island.getPlan().getSize() * -0.5);
+            surfaces[z].draw(
+                island.getPlan().getSize() * -0.5 + layer.x,
+                island.getPlan().getSize() * -0.5 + layer.y);
 
             sprocket.pop();
         }
