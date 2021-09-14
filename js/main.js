@@ -103,7 +103,7 @@ const mouseDown = (x, y, drag) => {
 const mouseUp = touch => {
     dragging = false;
 
-    if (updated && !touch)
+    if (updated && !touch) {
         angleDelta = ANGLE_SPEED * Math.sign(angleDelta);
     } else {
         angleDelta = 0;
