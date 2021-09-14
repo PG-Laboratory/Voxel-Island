@@ -1,4 +1,4 @@
-const Shapes = function (size, height) {
+const Shapes = function(size, height) {
     const sizeCells = Math.ceil(size * Shapes.CELL_SIZE_INVERSE);
     const sizeCellsSquared = sizeCells * sizeCells;
     const heightCells = Math.ceil(height * Shapes.CELL_SIZE_INVERSE);
@@ -7,16 +7,38 @@ const Shapes = function (size, height) {
     for (let i = 0; i < cells.length; ++i)
         cells[i] = [];
 
+    const cropBounds = bounds => {
+        if (bounds.start.x < 0)
+            bounds.start.x = 0;
+
+        if (bounds.start.y < 0)
+            bounds.start.y = 0;
+
+        if (bounds.start.z < 0)
+            bounds.start.z = 0;
+
+        if (bounds.end.x > size)
+            bounds.end.x = size;
+
+        if (bounds.end.y > size)
+            bounds.end.y = size;
+
+        if (bounds.end.z > height)
+            bounds.end.z = height;
+    };
+
     this.add = shape => {
-        for (let z = Math.floor(shape.bounds.start.z * Shapes.CELL_SIZE_INVERSE); 
-            z < Math.ceil(shape.bounds.end.z * Shapes.CELL_SIZE_INVERSE);
-            ++z) {
-            for (let y = Math.floor(shape.bounds.start.y * Shapes.CELL_SIZE_INVERSE); 
-                y < Math.ceil(shape.bounds.end.y * Shapes.CELL_SIZE_INVERSE);
-                ++y) {
-                for (let x = Math.floor(shape.bounds.start.x * Shapes.CELL_SIZE_INVERSE); 
-                    x < Math.ceil(shape.bounds.end.x * Shapes.CELL_SIZE_INVERSE);
-                    ++x) {
+        cropBounds(shape.bounds);
+
+        for (let z = Math.floor(shape.bounds.start.z * Shapes.CELL_SIZE_INVERSE);
+             z < Math.ceil(shape.bounds.end.z * Shapes.CELL_SIZE_INVERSE);
+             ++z) {
+            for (let y = Math.floor(shape.bounds.start.y * Shapes.CELL_SIZE_INVERSE);
+                 y < Math.ceil(shape.bounds.end.y * Shapes.CELL_SIZE_INVERSE);
+                 ++y) {
+                for (let x = Math.floor(shape.bounds.start.x * Shapes.CELL_SIZE_INVERSE);
+                     x < Math.ceil(shape.bounds.end.x * Shapes.CELL_SIZE_INVERSE);
+                     ++x) {
                     cells[z * sizeCellsSquared + y * sizeCells + x].push(shape);
                 }
             }

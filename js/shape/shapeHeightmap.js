@@ -18,7 +18,7 @@ const ShapeHeightmap = function(heightmap, height) {
                 bufferedColors[index] = Heightmap.GRADIENTS[Heightmap.TYPE_DEFAULT].sample(
                     Math.pow(
                         heightmap.getHeight(x, y),
-                        Math.pow(heightmap.getNormal(x, y).dot(ShapeHeightmap.UP), ShapeHeightmap.GRADIENT_POWER)));
+                        Math.pow(heightmap.getNormal(x, y).dot(Vector3.UP), ShapeHeightmap.GRADIENT_POWER)));
 
             return new Sample(
                 bufferedColors[index],
@@ -36,5 +36,4 @@ const ShapeHeightmap = function(heightmap, height) {
     }
 };
 
-ShapeHeightmap.GRADIENT_POWER = 0.35;
-ShapeHeightmap.UP = new Vector3(0, 0, 1);
+ShapeHeightmap.GRADIENT_POWER = 0.35; 
